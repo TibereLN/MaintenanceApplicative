@@ -169,4 +169,11 @@ class GildedRoseTest {
         app.updateQuality();
         assertEquals(0, app.items[0].quality);
     }
+    @Test
+    void testConjured6() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, 5, 3) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(1, app.items[0].quality);
+    }
 }
