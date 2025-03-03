@@ -1,6 +1,6 @@
 package com.gildedrose;
 
-public class AgedBrie extends ItemUpdate {
+public class AgedBrie extends ItemSimple {
     public AgedBrie(String name, int sellIn, int quality) {
         super(name, sellIn, quality);
     }

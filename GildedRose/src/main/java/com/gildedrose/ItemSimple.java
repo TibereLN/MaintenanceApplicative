@@ -1,7 +1,7 @@
 package com.gildedrose;
 
-public class ItemUpdate extends Item {
-    public ItemUpdate(String name, int sellIn, int quality) {
+public class ItemSimple extends Item {
+    public ItemSimple(String name, int sellIn, int quality) {
         super(name, sellIn, quality);
     }
 
