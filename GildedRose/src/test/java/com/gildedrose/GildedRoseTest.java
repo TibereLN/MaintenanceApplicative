@@ -133,4 +133,40 @@ class GildedRoseTest {
         app.updateQuality();
         assertEquals(50, app.items[0].quality);
     }
+
+    @Test
+    void testConjured() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, 5, 2) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(0, app.items[0].quality);
+    }
+    @Test
+    void testConjured2() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, 5, 1) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(0, app.items[0].quality);
+    }
+    @Test
+    void testConjured3() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, 0, 4) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(0, app.items[0].quality);
+    }
+    @Test
+    void testConjured4() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, 0, 3) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(0, app.items[0].quality);
+    }
+    @Test
+    void testConjured5() {
+        ItemSimple[] items = new ItemSimple[] { new Conjured(GildedRose.CONJURED, -1, 2) };
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertEquals(0, app.items[0].quality);
+    }
 }
