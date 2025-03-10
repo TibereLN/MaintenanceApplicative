@@ -2,10 +2,7 @@ package trivia;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,17 +34,17 @@ public class GameRefacto {
     public void testMinPlayers() {
         IGame game = new Game();
         //Test à 0
-
+        assertFalse(game.isGameValid());
         //Test à 1
         game.add("J1");
+        assertFalse(game.isGameValid());
         //Test à 2
         game.add("J2");
-
-        game.isGameValid();
+        assertTrue(game.isGameValid());
     }
 
     @Test
-    public void testPlayerEnterAfterGameStart() {
+    public void testPlayerEnterAfterGameStart() throws Exception {
         IGame game = new Game();
         game.add("JI");
         game.add("JO");
@@ -66,5 +63,58 @@ public class GameRefacto {
         assertTrue(result);
         result = game.add("JI");
         assertFalse(result);
+    }
+
+    @Test
+    public void testSecondeChance() throws Exception  {
+        IGame game = new Game();
+        game.add("JI");
+        game.add("JO");
+        game.roll(1);
+        assertTrue(game.wrongAnswer());
+        assertTrue(game.wrongAnswer());
+        game.roll(2);
+        assertTrue(game.wrongAnswer());
+        assertTrue(game.handleCorrectAnswer());
+    }
+
+    @Test
+    public void testStreak() throws Exception  {
+        Game game = new Game();
+        game.add("JI");
+        game.add("JO");
+        game.roll(1);
+        game.handleCorrectAnswer();
+        assertEquals(1, game.players.get(0).getScore());
+        //PLAYER 1 STREAK = 1
+        game.roll(1);
+        game.handleCorrectAnswer();
+        assertEquals(1, game.players.get(1).getStreak());
+        //PLAYER 2 STREAK = 1
+        game.roll(1);
+        game.handleCorrectAnswer();
+        assertEquals(2, game.players.get(0).getScore());
+        //PLAYER 1 STREAK = 2
+        game.roll(1);
+        game.wrongAnswer();
+        game.wrongAnswer();
+        assertEquals(0, game.players.get(1).getStreak());
+        //PLAYER 2 STREAK = 0
+        game.roll(1);
+        game.handleCorrectAnswer();
+        assertEquals(3, game.players.get(0).getScore());
+        //PLAYER 1 STREAK = 3
+        game.roll(1);
+        game.wrongAnswer();
+        game.wrongAnswer();
+        assertTrue(game.players.get(1).isInJail());
+        //PLAYER 2 STREAK = 0 IN JAIL
+
+        game.roll(1);
+        game.handleCorrectAnswer();
+        assertEquals(5, game.players.get(0).getScore());
+        //PLAYER 1 STREAK = 4
+        game.roll(1);
+        game.handleCorrectAnswer();
     }
 }

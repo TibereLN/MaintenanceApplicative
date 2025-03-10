@@ -4,7 +4,7 @@ public interface IGame {
 
 	boolean add(String playerName);
 
-	void roll(int roll);
+	void roll(int roll) throws Exception;
 
 	boolean handleCorrectAnswer();
 

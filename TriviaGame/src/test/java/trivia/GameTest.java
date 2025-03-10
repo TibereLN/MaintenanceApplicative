@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 
 public class GameTest {
 	@Test
-	public void caracterizationTest() {
+	public void caracterizationTest() throws Exception  {
 		// runs 10.000 "random" games to see the output of old and new code mathces
 		for (int seed = 1; seed < 10_000; seed++) {
 			testSeed(seed, false);
 		}
 	}
 
-	private void testSeed(int seed, boolean printExpected) {
+	private void testSeed(int seed, boolean printExpected) throws Exception  {
 		String expectedOutput = extractOutput(new Random(seed), new GameOld());
 		if (printExpected) {
 			System.out.println(expectedOutput);
@@ -29,11 +29,11 @@ public class GameTest {
 
 	//@Disabled("enable back and set a particular seed to see the output")
 	@Test
-	public void oneSeed() {
+	public void oneSeed() throws Exception  {
 		testSeed(1, true);
 	}
 
-	private String extractOutput(Random rand, IGame aGame) {
+	private String extractOutput(Random rand, IGame aGame) throws Exception  {
 		PrintStream old = System.out;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (PrintStream inmemory = new PrintStream(baos)) {

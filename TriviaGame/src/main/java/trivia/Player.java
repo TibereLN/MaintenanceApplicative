@@ -5,12 +5,14 @@ public class Player {
     private int score;
     private int position;
     private boolean isInJail;
+    private int streak;
 
     Player(String name) {
         this.name = name;
         this.score = 0;
         this.position = 1;
         this.isInJail = false;
+        this.streak = 0;
     }
 
     public String getName() {
@@ -39,5 +41,12 @@ public class Player {
 
     public void setInJail(boolean inJail) {
         isInJail = inJail;
+    }
+    public int getStreak() {
+        return streak;
+    }
+
+    public void setStreak(int streak) {
+        this.streak = streak;
     }
 }
