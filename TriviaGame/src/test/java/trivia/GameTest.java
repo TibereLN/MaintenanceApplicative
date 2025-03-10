@@ -1,4 +1,3 @@
-
 package trivia;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +8,6 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 
 public class GameTest {
 	@Test
@@ -29,8 +27,8 @@ public class GameTest {
 		assertEquals(expectedOutput, actualOutput);
 	}
 
+	//@Disabled("enable back and set a particular seed to see the output")
 	@Test
-	@Disabled("enable back and set a particular seed to see the output")
 	public void oneSeed() {
 		testSeed(1, true);
 	}
