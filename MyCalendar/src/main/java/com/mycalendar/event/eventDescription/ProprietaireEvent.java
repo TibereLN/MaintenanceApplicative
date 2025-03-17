@@ -1,11 +1,13 @@
 package com.mycalendar.event.eventDescription;
 
+import com.mycalendar.user.User;
+
 public class ProprietaireEvent {
-    private final String proprietaire;
-    public ProprietaireEvent(String proprietaire) {
+    private final User proprietaire;
+    public ProprietaireEvent(User proprietaire) {
         this.proprietaire = proprietaire;
     }
-    public String getProprietaire() {
+    public User getProprietaire() {
         return proprietaire;
     }
 }

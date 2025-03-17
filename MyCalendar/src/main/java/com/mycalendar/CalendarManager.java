@@ -23,7 +23,7 @@ public class CalendarManager {
         List<Event> result = new ArrayList<>();
         for (Event e : events.getEvents()) {
             if (e instanceof EventPeriodique) {
-                LocalDateTime temp = e.dateDebut;
+                LocalDateTime temp = e.dateDebut.getDateDebut();
                 while (temp.isBefore(fin)) {
                     if (!temp.isBefore(debut)) {
                         result.add(e);
@@ -31,7 +31,7 @@ public class CalendarManager {
                     }
                     temp = temp.plusDays(((EventPeriodique) e).frequenceJours.getFrequenceJours());
                 }
-            } else if (!e.dateDebut.isBefore(debut) && !e.dateDebut.isAfter(fin)) {
+            } else if (!e.dateDebut.getDateDebut().isBefore(debut) && !e.dateDebut.getDateDebut().isAfter(fin)) {
                 result.add(e);
             }
         }
@@ -39,14 +39,14 @@ public class CalendarManager {
     }
 
     public boolean conflit(Event e1, Event e2) {
-        LocalDateTime fin1 = e1.dateDebut.plusMinutes(e1.dureeMinutes.getDureeMinutes());
-        LocalDateTime fin2 = e2.dateDebut.plusMinutes(e2.dureeMinutes.getDureeMinutes());
+        LocalDateTime fin1 = e1.dateDebut.getDateDebut().plusMinutes(e1.dureeMinutes.getDureeMinutes());
+        LocalDateTime fin2 = e2.dateDebut.getDateDebut().plusMinutes(e2.dureeMinutes.getDureeMinutes());
 
         if (e1 instanceof EventPeriodique || e2 instanceof EventPeriodique) {
             return false; // Simplification abusive
         }
 
-        if (e1.dateDebut.isBefore(fin2) && fin1.isAfter(e2.dateDebut)) {
+        if (e1.dateDebut.getDateDebut().isBefore(fin2) && fin1.isAfter(e2.dateDebut.getDateDebut())) {
             return true;
         }
         return false;

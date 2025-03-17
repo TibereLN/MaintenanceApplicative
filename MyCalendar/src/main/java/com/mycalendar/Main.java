@@ -1,12 +1,11 @@
 package com.mycalendar;
 
-import com.mycalendar.event.eventDescription.DureeMinutesEvent;
-import com.mycalendar.event.eventDescription.LieuEvent;
 import com.mycalendar.event.eventType.Event;
-import com.mycalendar.event.eventDescription.TitreEvent;
 import com.mycalendar.event.eventType.EventPeriodique;
 import com.mycalendar.event.eventType.EventRDVPerso;
 import com.mycalendar.event.eventType.EventReunion;
+import com.mycalendar.user.User;
+import com.mycalendar.user.Users;
 
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
@@ -19,16 +18,18 @@ public class Main {
     public static void main(String[] args) {
         CalendarManager calendar = new CalendarManager();
         Scanner scanner = new Scanner(System.in);
-        String utilisateur = null;
+
+        User currentUser = null;
         boolean continuer = true;
 
-        String utilisateurs[] = new String[99];
-        String motsDePasses[] = new String[99];
-        int nbUtilisateurs = 0;
+        Users users = new Users();
+        //Utilisateurs déjà existants
+        users.addUser(new User("Roger", "Chat"));
+        users.addUser(new User("Pierre", "KiRouhl"));
 
         while (true) {
 
-            if (utilisateur == null) {
+            if (currentUser == null) {
                 System.out.println("  _____         _                   _                __  __");
                 System.out.println(" / ____|       | |                 | |              |  \\/  |");
                 System.out.println(
@@ -51,52 +52,37 @@ public class Main {
                 switch (scanner.nextLine()) {
                     case "1":
                         System.out.print("Nom d'utilisateur: ");
-                        utilisateur = scanner.nextLine();
+                        String name = scanner.nextLine();
 
-                        if (utilisateur.equals("Roger")) {
-                            String motDePasse = scanner.nextLine();
-                            if (!motDePasse.equals("Chat")) {
-                                utilisateur = null;
+                        if (users.containUser(name)) {
+                            System.out.print("Mot de passe: ");
+                            String mdp = scanner.nextLine();
+                            if (users.validMDP(name, mdp)) {
+                                currentUser = users.getUser(name);
+                                System.out.println("Connexion efffectuée !");
                             }
-                        } else {
-                            if (utilisateur.equals("Pierre")) {
-                                String motDePasse = scanner.nextLine();
-                                if (!motDePasse.equals("KiRouhl")) {
-                                    utilisateur = null;
-                                }
-                            } else {
-                                System.out.print("Mot de passe: ");
-                                String motDePasse = scanner.nextLine();
-
-                                for (int i = 0; i < nbUtilisateurs; i = i + 1) {
-                                    if (utilisateurs[i].equals(utilisateur) && motsDePasses[i].equals(motDePasse)) {
-                                        utilisateur = utilisateurs[i];
-                                    }
-                                }
-                            }
+                            else System.out.println("Mot de passe invalide");
                         }
+                        else System.out.println("Aucun utilisateur a ce nom");
                         break;
 
                     case "2":
                         System.out.print("Nom d'utilisateur: ");
-                        utilisateur = scanner.nextLine();
+                        String name = scanner.nextLine();
                         System.out.print("Mot de passe: ");
-                        String motDePasse = scanner.nextLine();
+                        String mdp = scanner.nextLine();
                         System.out.print("Répéter mot de passe: ");
-                        if (scanner.nextLine().equals(motDePasse)) {
-                            utilisateurs[nbUtilisateurs] = utilisateur;
-                            motsDePasses[nbUtilisateurs] = motDePasse;
-                            nbUtilisateurs = nbUtilisateurs + 1;
-                        } else {
-                            System.out.println("Les mots de passes ne correspondent pas...");
-                            utilisateur = null;
+                        if (scanner.nextLine().equals(mdp)) {
+                            users.addUser(new User(name, mdp));
+                            currentUser = users.getUser(name);
                         }
+                        else System.out.println("Les mots de passes ne correspondent pas...");
                         break;
                 }
             }
 
-            while (continuer && utilisateur != null) {
-                System.out.println("\nBonjour, " + utilisateur);
+            while (continuer && currentUser != null) {
+                System.out.println("\nBonjour, " + currentUser.getName());
                 System.out.println("=== Menu Gestionnaire d'Événements ===");
                 System.out.println("1 - Voir les événements");
                 System.out.println("2 - Ajouter un rendez-vous perso");
@@ -185,7 +171,7 @@ public class Main {
                         System.out.print("Durée (en minutes) : ");
                         int duree = Integer.parseInt(scanner.nextLine());
 
-                        calendar.ajouterEvent(new EventRDVPerso(titre, utilisateur, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree));
+                        calendar.ajouterEvent(new EventRDVPerso(titre, currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree));
 
                         System.out.println("Événement ajouté.");
                         break;
@@ -210,17 +196,15 @@ public class Main {
                         String lieu = scanner.nextLine();
 
                         List<String> participants = new ArrayList<>();
-                        participants.add(utilisateur);
-                        
-                        boolean encore = true;
+                        participants.add(currentUser.getName());
+
                         System.out.println("Ajouter un participant ? (oui / non)");
-                        while (scanner.nextLine().equals("oui"))
-                        {
+                        while (scanner.nextLine().equals("oui")) {
                             System.out.print("Participants : " + participants);
                             participants.add(scanner.nextLine());
                         }
 
-                        calendar.ajouterEvent(new EventReunion(titre2, utilisateur, LocalDateTime.of(annee2, moisRdv2, jourRdv2, heure2, minute2), duree2,
+                        calendar.ajouterEvent(new EventReunion(titre2, currentUser, LocalDateTime.of(annee2, moisRdv2, jourRdv2, heure2, minute2), duree2,
                                 lieu, participants));
 
                         System.out.println("Événement ajouté.");
@@ -243,16 +227,16 @@ public class Main {
                         System.out.print("Frequence (en jours) : ");
                         int frequence = Integer.parseInt(scanner.nextLine());
 
-                        calendar.ajouterEvent(new EventPeriodique(titre3, utilisateur, LocalDateTime.of(annee3, moisRdv3, jourRdv3, heure3, minute3), 0, frequence));
+                        calendar.ajouterEvent(new EventPeriodique(titre3, currentUser, LocalDateTime.of(annee3, moisRdv3, jourRdv3, heure3, minute3), 0, frequence));
 
                         System.out.println("Événement ajouté.");
                         break;
 
                     default:
                         System.out.println("Déconnexion ! Voulez-vous continuer ? (O/N)");
-                        continuer = scanner.nextLine().trim().equalsIgnoreCase("oui");
+                        continuer = scanner.nextLine().trim().equalsIgnoreCase("O");
 
-                        utilisateur = null;
+                        currentUser = null;
                 }
             }
         }
