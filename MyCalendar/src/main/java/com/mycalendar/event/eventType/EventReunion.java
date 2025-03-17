@@ -17,6 +17,6 @@ public class EventReunion extends Event {
     }
 
     public String description() {
-        return "Réunion : " + titre + " à " + lieu + " avec " + participants;
+        return "Réunion : " + titre.getTitre() + " à " + lieu.getLieu() + " avec " + participants.getParticipants();
     }
 }

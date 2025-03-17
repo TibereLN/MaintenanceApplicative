@@ -19,42 +19,21 @@ public class CalendarManager {
         events.addEvent(event);
     }
 
-    public List<Event> eventsDansPeriode(LocalDateTime debut, LocalDateTime fin) {
-        List<Event> result = new ArrayList<>();
-        for (Event e : events.getEvents()) {
-            if (e instanceof EventPeriodique) {
-                LocalDateTime temp = e.dateDebut.getDateDebut();
-                while (temp.isBefore(fin)) {
-                    if (!temp.isBefore(debut)) {
-                        result.add(e);
-                        break;
-                    }
-                    temp = temp.plusDays(((EventPeriodique) e).frequenceJours.getFrequenceJours());
-                }
-            } else if (!e.dateDebut.getDateDebut().isBefore(debut) && !e.dateDebut.getDateDebut().isAfter(fin)) {
-                result.add(e);
-            }
-        }
-        return result;
+    public Events getEvents() {
+        return events;
     }
 
-    public boolean conflit(Event e1, Event e2) {
-        LocalDateTime fin1 = e1.dateDebut.getDateDebut().plusMinutes(e1.dureeMinutes.getDureeMinutes());
-        LocalDateTime fin2 = e2.dateDebut.getDateDebut().plusMinutes(e2.dureeMinutes.getDureeMinutes());
+    public boolean conflit(Event event1, Event event2) {
+        LocalDateTime fin1 = event1.dateDebut.getDateDebut().plusMinutes(event1.dureeMinutes.getDureeMinutes());
+        LocalDateTime fin2 = event2.dateDebut.getDateDebut().plusMinutes(event2.dureeMinutes.getDureeMinutes());
 
-        if (e1 instanceof EventPeriodique || e2 instanceof EventPeriodique) {
+        if (event1 instanceof EventPeriodique || event2 instanceof EventPeriodique) {
             return false; // Simplification abusive
         }
 
-        if (e1.dateDebut.getDateDebut().isBefore(fin2) && fin1.isAfter(e2.dateDebut.getDateDebut())) {
+        if (event1.dateDebut.getDateDebut().isBefore(fin2) && fin1.isAfter(event2.dateDebut.getDateDebut())) {
             return true;
         }
         return false;
-    }
-
-    public void afficherEvenements() {
-        for (Event e : events.getEvents()) {
-            System.out.println(e.description());
-        }
     }
 }

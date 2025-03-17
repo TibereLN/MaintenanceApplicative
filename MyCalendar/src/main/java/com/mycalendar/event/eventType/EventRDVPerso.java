@@ -12,6 +12,6 @@ public class EventRDVPerso extends Event {
 
     @Override
     public String description() {
-        return "RDV : " + titre + " à " + dateDebut.toString();
+        return "RDV : " + titre.getTitre() + " à " + dateDebut.getDateDebut().toString();
     }
 }

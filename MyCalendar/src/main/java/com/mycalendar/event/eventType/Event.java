@@ -11,10 +11,10 @@ public abstract class Event {
     public DateDebutEvent dateDebut;
     public DureeMinutesEvent dureeMinutes;
 
-    public Event(String titre, User proprietaire, DateDebutEvent dateDebut, int dureeMinutes) {
+    public Event(String titre, User proprietaire, LocalDateTime dateDebut, int dureeMinutes) {
         this.titre = new TitreEvent(titre);
         this.proprietaire = new ProprietaireEvent(proprietaire);
-        this.dateDebut = dateDebut;
+        this.dateDebut = new DateDebutEvent(dateDebut);
         this.dureeMinutes = new DureeMinutesEvent(dureeMinutes);
     }
 
