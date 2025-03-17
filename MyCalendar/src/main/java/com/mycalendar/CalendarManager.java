@@ -1,31 +1,35 @@
+package com.mycalendar;
+
+import com.mycalendar.event.Events;
+import com.mycalendar.event.eventType.Event;
+import com.mycalendar.event.eventType.EventPeriodique;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CalendarManager {
-    public List<Event> events;
+    public Events events;
 
     public CalendarManager() {
-        this.events = new ArrayList<>();
+        this.events = new Events();
     }
 
-    public void ajouterEvent(String type, String title, String proprietaire, LocalDateTime dateDebut, int dureeMinutes,
-                             String lieu, String participants, int frequenceJours) {
-        Event e = new Event(type, title, proprietaire, dateDebut, dureeMinutes, lieu, participants, frequenceJours);
-        events.add(e);
+    public void ajouterEvent(Event event) {
+        events.addEvent(event);
     }
 
     public List<Event> eventsDansPeriode(LocalDateTime debut, LocalDateTime fin) {
         List<Event> result = new ArrayList<>();
-        for (Event e : events) {
-            if (e.type.equals("PERIODIQUE")) {
+        for (Event e : events.getEvents()) {
+            if (e instanceof EventPeriodique) {
                 LocalDateTime temp = e.dateDebut;
                 while (temp.isBefore(fin)) {
                     if (!temp.isBefore(debut)) {
                         result.add(e);
                         break;
                     }
-                    temp = temp.plusDays(e.frequenceJours);
+                    temp = temp.plusDays(((EventPeriodique) e).frequenceJours.getFrequenceJours());
                 }
             } else if (!e.dateDebut.isBefore(debut) && !e.dateDebut.isAfter(fin)) {
                 result.add(e);
@@ -35,10 +39,10 @@ public class CalendarManager {
     }
 
     public boolean conflit(Event e1, Event e2) {
-        LocalDateTime fin1 = e1.dateDebut.plusMinutes(e1.dureeMinutes);
-        LocalDateTime fin2 = e2.dateDebut.plusMinutes(e2.dureeMinutes);
+        LocalDateTime fin1 = e1.dateDebut.plusMinutes(e1.dureeMinutes.getDureeMinutes());
+        LocalDateTime fin2 = e2.dateDebut.plusMinutes(e2.dureeMinutes.getDureeMinutes());
 
-        if (e1.type.equals("PERIODIQUE") || e2.type.equals("PERIODIQUE")) {
+        if (e1 instanceof EventPeriodique || e2 instanceof EventPeriodique) {
             return false; // Simplification abusive
         }
 
@@ -49,7 +53,7 @@ public class CalendarManager {
     }
 
     public void afficherEvenements() {
-        for (Event e : events) {
+        for (Event e : events.getEvents()) {
             System.out.println(e.description());
         }
     }
