@@ -7,12 +7,11 @@ import com.mycalendar.event.eventType.EventReunion;
 import com.mycalendar.user.User;
 import com.mycalendar.user.Users;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-public class Main {
+public class Application {
     CalendarManager calendar = new CalendarManager();
     Users users = new Users();
     User currentUser = null;
