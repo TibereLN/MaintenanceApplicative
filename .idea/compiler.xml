@@ -7,8 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="gilded-rose-kata" />
-        <module name="A" />
         <module name="uglytrivia" />
+        <module name="MyCalendar" />
       </profile>
     </annotationProcessing>
   </component>
