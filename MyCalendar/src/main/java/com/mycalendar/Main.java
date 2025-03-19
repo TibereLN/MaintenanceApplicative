@@ -7,6 +7,7 @@ import com.mycalendar.event.eventType.EventReunion;
 import com.mycalendar.user.User;
 import com.mycalendar.user.Users;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -17,10 +18,28 @@ public class Main {
     User currentUser = null;
     boolean continuer = true;
     Scanner scanner = new Scanner(System.in);
-
-    private final HashMap<String, >
+    List<Runnable> commandesMenuConnexion = new ArrayList<>();
+    List<Runnable> commandesMenuGlobal = new ArrayList<>();
+    List<Runnable> commandesMenuAfficherEvenements = new ArrayList<>();
+    List<Runnable> commandesMenuAjouterEvenements = new ArrayList<>();
 
     public void main() {
+        commandesMenuConnexion.addLast(this::connexion);
+        commandesMenuConnexion.addLast(this::inscription);
+
+        commandesMenuGlobal.addLast(this::menuAfficherEvenements);
+        commandesMenuGlobal.addLast(this::menuAjouterEvenement);
+        commandesMenuGlobal.addLast(this::deconnexion);
+
+        commandesMenuAfficherEvenements.addLast(this::afficherTousEvenements);
+        commandesMenuAfficherEvenements.addLast(this::afficherEvenementsMois);
+        commandesMenuAfficherEvenements.addLast(this::afficherEvenementsSemaine);
+        commandesMenuAfficherEvenements.addLast(this::afficherEvenementsJour);
+
+        commandesMenuAjouterEvenements.addLast(this::ajouterEvenementRDV);
+        commandesMenuAjouterEvenements.addLast(this::ajouterEvenementReunion);
+        commandesMenuAjouterEvenements.addLast(this::ajouterEvenementPeriodique);
+
         //Utilisateurs déjà existants
         users.addUser(new User("Roger", "Chat"));
         users.addUser(new User("Pierre", "KiRouhl"));
@@ -30,17 +49,8 @@ public class Main {
                 afficherLogo();
                 System.out.println("1 - Se connecter");
                 System.out.println("2 - Créer un compte");
-                System.out.println("Choix : ");
-                switch (scanner.nextLine()) {
-                    case "1":
-                        connexion();
-                        break;
-                    case "2":
-                        inscription();
-                        break;
-                    default:
-                        System.out.println("Veuillez choisir une option");
-                }
+                System.out.println("Votre choix : ");
+                commandesMenuConnexion.get(Integer.parseInt(scanner.nextLine())-1).run();
             }
             while (currentUser != null) {
                 System.out.println("\nBonjour, " + currentUser.getName());
@@ -49,20 +59,7 @@ public class Main {
                 System.out.println("2 - Ajouter un évènement");
                 System.out.println("3 - Se déconnecter");
                 System.out.print("Votre choix : ");
-
-                switch (scanner.nextLine()) {
-                    case "1":
-                        menuAfficherEvenements();
-                        break;
-                    case "2":
-                        menuAjouterEvenement();
-                        break;
-                    case "3":
-                        deconnexion();
-                        break;
-                    default:
-                        System.out.println("Veuillez choisir une option");
-                }
+                commandesMenuGlobal.get(Integer.parseInt(scanner.nextLine())-1).run();
             }
         }
     }
@@ -104,51 +101,51 @@ public class Main {
         System.out.println("2 - Afficher les événements d'un MOIS précis");
         System.out.println("3 - Afficher les événements d'une SEMAINE précise");
         System.out.println("4 - Afficher les événements d'un JOUR précis");
-        System.out.println("5 - Retour");
+        System.out.println("Autres - Retour");
         System.out.print("Votre choix : ");
+        commandesMenuAfficherEvenements.get(Integer.parseInt(scanner.nextLine())-1).run();
+    }
 
-        switch (scanner.nextLine()) {
-            case "1":
-                LocalDateTime debut = LocalDateTime.of(-Integer.MAX_VALUE, 0, 1, 0, 0);
-                LocalDateTime fin = LocalDateTime.now().plusYears(Integer.MAX_VALUE);
-                afficherEvenements(debut, fin);
-                break;
+    private void afficherTousEvenements() {
+        LocalDateTime debut = LocalDateTime.MIN;
+        LocalDateTime fin = LocalDateTime.MAX;
+        afficherEvenements(debut, fin);
+    }
 
-            case "2":
-                System.out.print("Entrez l'année (AAAA) : "); int anneeMois = Integer.parseInt(scanner.nextLine());
-                System.out.print("Entrez le mois (1-12) : "); int mois = Integer.parseInt(scanner.nextLine());
+    private void afficherEvenementsMois() {
+        System.out.print("Entrez l'année (AAAA) : "); int anneeMois = Integer.parseInt(scanner.nextLine());
+        System.out.print("Entrez le mois (1-12) : "); int mois = Integer.parseInt(scanner.nextLine());
 
-                LocalDateTime debutMois = LocalDateTime.of(anneeMois, mois, 1, 0, 0);
-                LocalDateTime finMois = debutMois.plusMonths(1).minusSeconds(1);
+        LocalDateTime debutMois = LocalDateTime.of(anneeMois, mois, 1, 0, 0);
+        LocalDateTime finMois = debutMois.plusMonths(1).minusSeconds(1);
 
-                afficherEvenements(debutMois, finMois);
-                break;
-            case "3":
-                System.out.print("Entrez l'année (AAAA) : "); int anneeSemaine = Integer.parseInt(scanner.nextLine());
-                System.out.print("Entrez le numéro de semaine (1-52) : "); int semaine = Integer.parseInt(scanner.nextLine());
+        afficherEvenements(debutMois, finMois);
+    }
 
-                LocalDateTime debutSemaine = LocalDateTime.now()
-                        .withYear(anneeSemaine)
-                        .with(WeekFields.of(Locale.FRANCE).weekOfYear(), semaine)
-                        .with(WeekFields.of(Locale.FRANCE).dayOfWeek(), 1)
-                        .withHour(0).withMinute(0);
-                LocalDateTime finSemaine = debutSemaine.plusDays(7).minusSeconds(1);
 
-                afficherEvenements(debutSemaine, finSemaine);
-                break;
-            case "4":
-                System.out.print("Entrez l'année (AAAA) : "); int anneeJour = Integer.parseInt(scanner.nextLine());
-                System.out.print("Entrez le mois (1-12) : "); int moisJour = Integer.parseInt(scanner.nextLine());
-                System.out.print("Entrez le jour (1-31) : "); int jour = Integer.parseInt(scanner.nextLine());
+    private void afficherEvenementsSemaine() {
+        System.out.print("Entrez l'année (AAAA) : "); int anneeSemaine = Integer.parseInt(scanner.nextLine());
+        System.out.print("Entrez le numéro de semaine (1-52) : "); int semaine = Integer.parseInt(scanner.nextLine());
 
-                LocalDateTime debutJour = LocalDateTime.of(anneeJour, moisJour, jour, 0, 0);
-                LocalDateTime finJour = debutJour.plusDays(1).minusSeconds(1);
+        LocalDateTime debutSemaine = LocalDateTime.now()
+                .withYear(anneeSemaine)
+                .with(WeekFields.of(Locale.FRANCE).weekOfYear(), semaine)
+                .with(WeekFields.of(Locale.FRANCE).dayOfWeek(), 1)
+                .withHour(0).withMinute(0);
+        LocalDateTime finSemaine = debutSemaine.plusDays(7).minusSeconds(1);
 
-                afficherEvenements(debutJour, finJour);
-                break;
-            default:
-                System.out.println("Veuillez choisir une option");
-        }
+        afficherEvenements(debutSemaine, finSemaine);
+    }
+
+    private void afficherEvenementsJour() {
+        System.out.print("Entrez l'année (AAAA) : "); int anneeJour = Integer.parseInt(scanner.nextLine());
+        System.out.print("Entrez le mois (1-12) : "); int moisJour = Integer.parseInt(scanner.nextLine());
+        System.out.print("Entrez le jour (1-31) : "); int jour = Integer.parseInt(scanner.nextLine());
+
+        LocalDateTime debutJour = LocalDateTime.of(anneeJour, moisJour, jour, 0, 0);
+        LocalDateTime finJour = debutJour.plusDays(1).minusSeconds(1);
+
+        afficherEvenements(debutJour, finJour);
     }
 
     private void menuAjouterEvenement() {
@@ -156,40 +153,53 @@ public class Main {
         System.out.println("1 - Ajouter un rendez-vous perso");
         System.out.println("2 - Ajouter une réunion");
         System.out.println("3 - Ajouter un évènement périodique");
-        String choix = scanner.nextLine();
+        System.out.print("Votre choix : ");
 
-        // Ajout simplifié d'un RDV personnel
-        System.out.print("Titre de l'événement : "); String titre = scanner.nextLine();
-        System.out.print("Année (AAAA) : "); int annee = Integer.parseInt(scanner.nextLine());
-        System.out.print("Mois (1-12) : "); int moisRdv = Integer.parseInt(scanner.nextLine());
-        System.out.print("Jour (1-31) : "); int jourRdv = Integer.parseInt(scanner.nextLine());
-        System.out.print("Heure début (0-23) : "); int heure = Integer.parseInt(scanner.nextLine());
-        System.out.print("Minute début (0-59) : "); int minute = Integer.parseInt(scanner.nextLine());
-        System.out.print("Durée (en minutes) : "); int duree = Integer.parseInt(scanner.nextLine());
-        switch (choix) {
-            case "1": //RDV Perso
-                this.calendar.ajouterEvent(new EventRDVPerso(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree));
-                break;
-            case "2": //Réunion
-                System.out.println("Lieu :"); String lieu = scanner.nextLine();
-                List<String> participants = new ArrayList<>();
-                participants.add(this.currentUser.getName());
-                System.out.println("Ajouter un participant ? (oui / non)");
-                while (scanner.nextLine().equals("oui")) {
-                    System.out.print("Participants : " + participants);  participants.add(scanner.nextLine());
-                }
-                this.calendar.ajouterEvent(new EventReunion(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree,
-                        lieu, participants));
-                break;
-            case "3":
-                System.out.print("Frequence (en jours) : "); int frequence = Integer.parseInt(scanner.nextLine());
-                this.calendar.ajouterEvent(new EventPeriodique(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree,
-                        frequence));
-                break;
-            default:
-                System.out.println("Veuillez choisir une option");
-        }
+        commandesMenuAjouterEvenements.get(Integer.parseInt(scanner.nextLine())-1).run();
         System.out.println("Événement ajouté.");
+    }
+
+    private void ajouterEvenementRDV() {
+        System.out.print("Titre de l'événement : ");String titre = scanner.nextLine();
+        System.out.print("Année (AAAA) : ");int annee = Integer.parseInt(scanner.nextLine());
+        System.out.print("Mois (1-12) : ");int moisRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Jour (1-31) : ");int jourRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Heure début (0-23) : ");int heure = Integer.parseInt(scanner.nextLine());
+        System.out.print("Minute début (0-59) : ");int minute = Integer.parseInt(scanner.nextLine());
+        System.out.print("Durée (en minutes) : ");int duree = Integer.parseInt(scanner.nextLine());
+        this.calendar.ajouterEvent(new EventRDVPerso(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree));
+    }
+
+    private void ajouterEvenementReunion() {
+        System.out.print("Titre de l'événement : ");String titre = scanner.nextLine();
+        System.out.print("Année (AAAA) : ");int annee = Integer.parseInt(scanner.nextLine());
+        System.out.print("Mois (1-12) : ");int moisRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Jour (1-31) : ");int jourRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Heure début (0-23) : ");int heure = Integer.parseInt(scanner.nextLine());
+        System.out.print("Minute début (0-59) : ");int minute = Integer.parseInt(scanner.nextLine());
+        System.out.print("Durée (en minutes) : ");int duree = Integer.parseInt(scanner.nextLine());
+        System.out.println("Lieu :"); String lieu = scanner.nextLine();
+        List<String> participants = new ArrayList<>();
+        participants.add(this.currentUser.getName());
+        System.out.println("Ajouter un participant ? (oui / non)");
+        while (scanner.nextLine().equals("oui")) {
+            System.out.print("Participants : " + participants);  participants.add(scanner.nextLine());
+        }
+        this.calendar.ajouterEvent(new EventReunion(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree,
+                lieu, participants));
+    }
+
+    private void ajouterEvenementPeriodique() {
+        System.out.print("Titre de l'événement : ");String titre = scanner.nextLine();
+        System.out.print("Année (AAAA) : ");int annee = Integer.parseInt(scanner.nextLine());
+        System.out.print("Mois (1-12) : ");int moisRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Jour (1-31) : ");int jourRdv = Integer.parseInt(scanner.nextLine());
+        System.out.print("Heure début (0-23) : ");int heure = Integer.parseInt(scanner.nextLine());
+        System.out.print("Minute début (0-59) : ");int minute = Integer.parseInt(scanner.nextLine());
+        System.out.print("Durée (en minutes) : ");int duree = Integer.parseInt(scanner.nextLine());
+        System.out.print("Frequence (en jours) : "); int frequence = Integer.parseInt(scanner.nextLine());
+        this.calendar.ajouterEvent(new EventPeriodique(titre, this.currentUser, LocalDateTime.of(annee, moisRdv, jourRdv, heure, minute), duree,
+                frequence));
     }
 
     private void afficherEvenements(LocalDateTime debut, LocalDateTime fin) {
